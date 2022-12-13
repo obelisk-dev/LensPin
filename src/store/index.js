@@ -7,9 +7,13 @@ import { gql } from '@apollo/client/core'
 import * as helpers from '../utils/helperFunctions'
 import * as ApolloRequest from '../utils/ApolloRequest'
 import Publication from '../utils/Post.js'
+import { useMobileDetection } from "vue3-mobile-detection";
+
 
 export const Store = defineStore('Store', {
   state: () => ({
+    Mobile:true,
+    sidePanelShow: true,
     provider: '',
     address: '',
     signer: '',
@@ -34,32 +38,49 @@ export const Store = defineStore('Store', {
     }
   },
   actions: {
+    //mobile detection
+    checkIfMobile() {
+      const { isMobile } = useMobileDetection()
+      this.Mobile = isMobile()
+      this.sidePanelShow = !this.Mobile
+
+    },
     //web3actions
     async setState() {
-      window.ethereum.enable()
-      const provider = markRaw(new ethers.providers.Web3Provider(window.ethereum))
-      const signer = await provider.getSigner()
-      const addr = await signer.getAddress()
-      this.provider = provider
-      this.address = addr
-      this.signer = signer
-      const network = await this.provider.getNetwork()
-      if (network.name && (network.name == 'matic' || network.name == 'MATIC')) {
-        this.web3Connected = true
-        this.web3Network = 'MATIC'
-        this.queryDefaultProfile()
-      } else {
-        this.web3Network = 'WRONG NETWORK'
+      try {
+        window.ethereum.on('accountsChanged', () => {
+          this.setState()
+        })
+        window.ethereum.on('chainChanged', () => {
+          this.setState()
+        })
+        const provider = markRaw(new ethers.providers.Web3Provider(window.ethereum))
+        const signer = await provider.getSigner()
+        const addr = await signer.getAddress()
+        this.provider = provider
+        this.address = addr
+        this.signer = signer
+        const network = await this.provider.getNetwork()
+        if (network.name && (network.name == 'matic' || network.name == 'MATIC')) {
+          this.web3Connected = true
+          this.web3Network = 'MATIC'
+          this.queryDefaultProfile()
+        } else {
+          this.web3Network = 'WRONG NETWORK'
+          this.web3Connected = true
+        }
+      } catch(err){
+        console.log(err)
         this.web3Connected = false
       }
-      
+    },
+    async web3PopUp() {
+      window.ethereum.enable()
     },
     async initWeb3() {
-      console.log('web3')
+      await this.web3PopUp()
       this.setState()
-      window.ethereum.on('accountsChanged', () => {
-        this.setState()
-      })
+      
     },
     //ipfsactions
     async startIPFS() {
@@ -79,6 +100,9 @@ export const Store = defineStore('Store', {
       console.log(stats)
       this.repoSize = stats.repoSize
       this.repoItems = stats.numObjects
+    },
+    flipNavBarVis() {
+      this.sidePanelShow = !this.sidePanelShow
     },
     async garbageCollect(){
       for await (const res of this.ipfs.repo.gc()) {

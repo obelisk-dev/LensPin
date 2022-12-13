@@ -2,12 +2,12 @@
     <v-card
     min-height="30vh"
     rounded="lg"
-    class=" ml-5 mr-5"
+    class="bg-peas ml-5 mr-5 mb-5"
     elevation="8"
     >
-    <v-banner class=" bg-basil font-weight-bold text-lg-h6">WEB3 STATUS</v-banner>
+    <v-banner class="bg-basil font-weight-bold text-lg-h6">WEB3 STATUS</v-banner>
+    <template v-if="this.web3Connected">
         <v-list class="bg-peas">
-
             <v-list-item>
                 <v-list-item-content>
                     <v-list-item-title class="bg-peas font-weight-bold">Status</v-list-item-title>
@@ -45,6 +45,10 @@
             </v-list-item>
 
         </v-list>
+        </template>
+        <template v-else-if="!this.web3Connected">
+            <v-btn md-alignment="center" color="darkgrey" class="mt-4 ml-2" @click="connectToWeb3()">Connect MetaMask</v-btn>
+        </template>
     </v-card>
 </template>
 
@@ -78,7 +82,7 @@
         };
     },
     mounted: function() {
-        this.connectToWeb3()
+        this.setState()
     },
     methods: {
         async connectToWeb3() {

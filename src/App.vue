@@ -1,20 +1,33 @@
 
 <template>
   <v-app id="inspire">
+    <v-layout>
     <TopHeader/>
-      <v-row class="">
-        <v-col cols="2">
-          <v-sheet class=" pt-10" elevation = '10' outlined height = "100%">
-
+          <v-navigation-drawer
+            floating
+            v-model="this.sidePanelShow"
+            class='pt-10' elevation = '10' outlined height = "100%">
             <IpfsSidePanel/>
             <Web3SidePanel/>
+          </v-navigation-drawer>
+          <v-main>
+            <!-- mobile alert -->
+            
+            <!-- beta alert -->
+            <v-alert
+              v-model="betaWarning"
+              density="compact"
+              type="warning"
+              closable
+              close-label="Close Alert"
+            >
+            LensPin is currently in development.  Feedback is welcomed!
+            </v-alert>
 
-          </v-sheet>
-        </v-col>
-        <v-col class="pl-6 pr-10 pt-10">
-          <router-view class="mt-16"></router-view>
-        </v-col>
-      </v-row>
+            <router-view class="ma-2"></router-view>
+            
+          </v-main>
+        </v-layout>
   </v-app>
 </template>
 
@@ -22,7 +35,23 @@
 import TopHeader from '/src/components/TopHeader.vue'
 import IpfsSidePanel from '/src/components/IpfsSidePanel.vue'
 import Web3SidePanel from '/src/components/Web3SidePanel.vue'
+import {Store} from './store'
+import {storeToRefs} from 'pinia'
+
   export default {
+    setup() {
+        const store = Store()
+        const { userlensprofilepic,sidePanelShow, Mobile } = storeToRefs(store)
+        const { checkIfMobile } = store
+        checkIfMobile()
+        return {
+            userlensprofilepic,
+            sidePanelShow,
+            Mobile,
+            checkIfMobile,
+            store
+        }
+      },
     name: 'AppView',
     components: {
       TopHeader,
@@ -32,7 +61,8 @@ import Web3SidePanel from '/src/components/Web3SidePanel.vue'
     },
     data: function() {
     return {
-
+        mobileWarning: this.Mobile,
+        betaWarning: true
       };
     },
     mounted: function() {

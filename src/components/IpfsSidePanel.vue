@@ -2,7 +2,7 @@
     <v-card
     min-height="30vh"
     rounded="lg"
-    class="bg-peas mb-5 ml-5 mr-5 mt-16"
+    class="bg-peas mb-5 ml-5 mr-5"
     elevation="8"
     >
         <v-banner class="bg-basil font-weight-bold text-lg-h6">IPFS STATUS</v-banner>

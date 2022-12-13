@@ -1,5 +1,5 @@
 <template>
-    <v-sheet rounded="lg" height="90%" >
+    <v-sheet rounded="lg" class ="fill-height" >
     <v-table class="pt-4" density="compact" fixed-header
     height="100%">
     <thead>
